@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+args=()
+flags=()
+
+from="${@:(($#-1)):1}"
+to="${@:$#}"
+
+for arg in "${@:1:(($# - 2))}"; do
+	if [ "${arg::1}" != '-' ]; then
+
+	  for path in $(dir-tree "$arg"); do
+		args+=("--include=$path")
+	  done
+
+	  args+=("--include=$arg/**")
+	else
+	  flags+=("$arg")
+	fi
+done
+
+echo "Running:"
+echo rsync -avzh "${flags[@]}" "${args[@]}" --exclude='*' "$from" "$to"
+rsync -avzh "${flags[@]}" "${args[@]}" --exclude='*' "$from" "$to"
