@@ -3,22 +3,23 @@
 args=()
 flags=()
 
-from="${@:(($#-1)):1}"
-to="${@:$#}"
+from=( "${@:(($#-1)):1}" )
+to=( "${@:$#}" )
+paths=( "${@:1:(($# - 2))}" )
 
-for arg in "${@:1:(($# - 2))}"; do
-	if [ "${arg::1}" != '-' ]; then
+for path in "${paths[@]}"; do
+  if [ "${path::1}" != '-' ]; then
 
-	  for path in $(dir-tree "$arg"); do
-		args+=("--include=$path")
-	  done
+    for path in $(dir-tree "$path"); do
+      args+=("--include=$path")
+    done
 
-	  args+=("--include=$arg/**")
-	else
-	  flags+=("$arg")
-	fi
+    args+=("--include=$path/**")
+  else
+    flags+=("$path")
+  fi
 done
 
 echo "Running:"
-echo rsync -avzh "${flags[@]}" "${args[@]}" --exclude='*' "$from" "$to"
-rsync -avzh "${flags[@]}" "${args[@]}" --exclude='*' "$from" "$to"
+echo rsync -avzh "${flags[@]}" "${args[@]}" --exclude='*' "${from[@]}" "${to[@]}"
+rsync -avzh "${flags[@]}" "${args[@]}" --exclude='*' "${from[@]}" "${to[@]}"
