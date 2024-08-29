@@ -17,12 +17,72 @@ rsync_only_n() {
 defn rson rsync_only_n
 
 defn rsp rsync-paths
+defn rspc rsync-paths --clean
+defn rspp rsync-paths --progress
+defn rsppr rsync-paths --progress --remove-source-files
+defn rsppz rsync-paths --progress --size-only
+defn rspz rsync-paths --size-only
 defn rsn rsync-paths -n
+defn rsnc rsync-paths -n --clean
+defn rsnz rsync-paths -n --size-only
+defn rsnzc rsync-paths -n --size-only -- clean
 defn rspr rsync-paths --remove-source-files
 
 defn epd explode-parent-dirs
 
-alias rsc="rsync -avzh"
-alias rsr="rsync -avzh --remove-source-files"
-alias rsrc="rsync -avzh --remove-source-files"
-alias rscn="rsync -avzhn"
+alias rsc="rsync -avzhm --progress"
+alias rscr="rsync -avzhm --progress --remove-source-files"
+alias rscrz="rsync -avzhm --progress --remove-source-files --size-only"
+alias rscz="rsync -avzhm --progress --size-only"
+alias rsr="rsync -avzhm --progress --remove-source-files"
+alias rsrc="rsync -avzhm --progress --remove-source-files"
+alias rscn="rsync -avzhmn"
+alias rscnz="rsync -avzhmn --size-only"
+
+rsync_include_args() {
+  if [ $# -lt 2 ]; then
+    echo "Usage: rsync_include_args [args...] <src> <dst>" >&2
+    return 1
+  fi
+  src="${@: -2:1}"
+  dst="${@: -1}"
+  set -- "${@:1:$(($#-2))}"
+  args=()
+  flags=()
+  clean=
+  for arg in "$@"; do
+    if [ "$arg" == --clean ]; then
+      clean=1
+    elif [ "${arg::1}" == '-' ]; then
+      flags+=("$arg")
+    else
+      while IFS= read -r line; do
+        if [[ "$line" == *\*\* ]]; then
+          continue
+        else
+          args+=("--include=$line")
+        fi
+      done < <(dir-tree "$arg")
+      args+=("--include=$arg/**")
+    fi
+  done
+  args+=(--include '*/')
+  if [ ${#args[@]} -gt 0 ]; then
+    args+=(--exclude '*')
+  fi
+}
+export -f rsync_include_args
+
+rsync_clean_output() {
+  grep -v -e '^receiving file list' -e '^$' -e '^sent [0-9\.KM]* bytes' -e '^total size is' -e '/$'
+}
+export -f rsync_clean_output
+defn rsco rsync_clean_output
+
+rsync_sizes_paths() {
+  rsync-paths -n "--out-format=%l %n" "$@"
+}
+defn rsps rsync_sizes_paths
+defn rspsc rsync_sizes_paths --clean
+defn rspz rsync_sizes_paths --size-only
+defn rspzc rsync_sizes_paths --size-only --clean
