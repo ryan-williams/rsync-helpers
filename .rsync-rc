@@ -19,6 +19,7 @@ defn rson rsync_only_n
 defn rsp rsync-paths
 defn rspc rsync-paths --clean
 defn rspp rsync-paths --progress
+defn rsppz rsync-paths --progress --size-only
 defn rsppr rsync-paths --progress --remove-source-files
 defn rsppz rsync-paths --progress --size-only
 defn rspz rsync-paths --size-only
@@ -84,5 +85,6 @@ rsync_sizes_paths() {
 }
 defn rsps rsync_sizes_paths
 defn rspsc rsync_sizes_paths --clean
-defn rspz rsync_sizes_paths --size-only
+defn rspsz rsync_sizes_paths --size-only
+defn rspszc rsync_sizes_paths --size-only --clean
 defn rspzc rsync_sizes_paths --size-only --clean
