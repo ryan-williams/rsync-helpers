@@ -42,7 +42,7 @@ alias rscnz="rsync -avzhmn --size-only"
 
 rsync_include_args() {
   if [ $# -lt 2 ]; then
-    echo "Usage: rsync_include_args [args...] <src> <dst>" >&2
+    echo "Usage: ${FUNCNAME[0]} [args...] <src> <dst>" >&2
     return 1
   fi
   src="${@: -2:1}"
