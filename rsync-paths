@@ -4,9 +4,9 @@ rsync_include_args "$@"
 
 cmd=(rsync -avzhm "${flags[@]}" "${args[@]}" "$src" "$dst")
 if [ -n "$clean" ]; then
-  echo "Running: ${cmd[@]} (and cleaning up output)" >&2
+  echo "Running: ${cmd[*]} (and cleaning up output)" >&2
   "${cmd[@]}" | rsync_clean_output
 else
-  echo "Running: ${cmd[@]}" >&2
+  echo "Running: ${cmd[*]}" >&2
   "${cmd[@]}"
 fi

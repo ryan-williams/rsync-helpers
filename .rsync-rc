@@ -45,8 +45,8 @@ rsync_include_args() {
     echo "Usage: ${FUNCNAME[0]} [args...] <src> <dst>" >&2
     return 1
   fi
-  src="${@: -2:1}"
-  dst="${@: -1}"
+  src="${*: -2:1}"
+  dst="${*: -1}"
   set -- "${@:1:$(($#-2))}"
   args=()
   flags=()
@@ -67,7 +67,6 @@ rsync_include_args() {
       args+=("--include=$arg/**")
     fi
   done
-  args+=(--include '*/')
   if [ ${#args[@]} -gt 0 ]; then
     args+=(--exclude '*')
   fi
